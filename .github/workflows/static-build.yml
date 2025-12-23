@@ -1,7 +1,9 @@
-name: Static Frontend Build & Deploy
+name: Static Frontend CI/CD Deploy
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build-deploy:
@@ -10,6 +12,13 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -24,20 +33,68 @@ jobs:
           NEXT_PUBLIC_API_URL_FASTAPI: https://v2-api.fordgeindia.online/api
         run: npm run build
 
-      - name: Deploy to S3 (ROOT)
+      # 1️⃣ Upload ALL static assets (hashed) → long cache
+      - name: Upload static assets with long cache
         run: |
-          aws s3 sync out/ s3://${{ secrets.S3_BUCKET }}/ --delete
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          aws s3 sync out s3://${{ secrets.S3_BUCKET }} \
+            --exclude "index.html" \
+            --cache-control "public,max-age=31536000,immutable" \
+            --delete
 
+      # 2️⃣ Upload index.html → no cache (CRITICAL)
+      - name: Upload index.html with no cache
+        run: |
+          aws s3 cp out/index.html s3://${{ secrets.S3_BUCKET }}/index.html \
+            --cache-control "no-cache,no-store,must-revalidate"
+
+      # 3️⃣ Invalidate CloudFront
       - name: Invalidate CloudFront
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+
+# name: Static Frontend Build & Deploy
+
+# on:
+#   workflow_dispatch:
+
+# jobs:
+#   build-deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repo
+#         uses: actions/checkout@v4
+
+#       - name: Setup Node
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 20
+
+#       - name: Install dependencies
+#         run: npm ci
+
+#       - name: Build static site (GLOBAL)
+#         env:
+#           NEXT_PUBLIC_API_URL_FASTAPI: https://v2-api.fordgeindia.online/api
+#         run: npm run build
+
+#       - name: Deploy to S3 (ROOT)
+#         run: |
+#           aws s3 sync out/ s3://${{ secrets.S3_BUCKET }}/ --delete
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           AWS_REGION: ${{ secrets.AWS_REGION }}
+
+#       - name: Invalidate CloudFront
+#         run: |
+#           aws cloudfront create-invalidation \
+#             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+#             --paths "/*"
+#         env:
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           AWS_REGION: ${{ secrets.AWS_REGION }}
