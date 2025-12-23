@@ -1,0 +1,32 @@
+name: Static Frontend Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static site
+        env:
+          NEXT_PUBLIC_VENDOR_SLUG: aadhya-shopping
+          NEXT_PUBLIC_API_URL_FASTAPI: https://v2-api.fordgeindia.online/api
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: out/
