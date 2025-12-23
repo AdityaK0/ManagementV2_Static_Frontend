@@ -5,11 +5,12 @@ import { createContext, useContext } from 'react';
 const PortfolioContext = createContext({
   portfolio: null,
   slug: null,
+  isLoading: true,
 });
 
-export const PortfolioProvider = ({ children, portfolio, slug }) => {
+export const PortfolioProvider = ({ children, portfolio, slug, isLoading }) => {
   return (
-    <PortfolioContext.Provider value={{ portfolio, slug }}>
+    <PortfolioContext.Provider value={{ portfolio, slug, isLoading }}>
       {children}
     </PortfolioContext.Provider>
   );

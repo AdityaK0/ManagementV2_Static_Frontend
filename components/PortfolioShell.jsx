@@ -44,17 +44,7 @@ export default function PortfolioShell({ children }) {
         fetchPortfolio();
     }, [updatePortfolioTheme]);
 
-    if (loading) {
-        return (
-            <div className="flex flex-col min-h-screen">
-                <div className="flex-1 flex items-center justify-center">
-                    <LoadingSpinner />
-                </div>
-            </div>
-        );
-    }
-
-    if (error || !portfolio) {
+    if (error || (!loading && !portfolio)) {
         return (
             <div className="flex flex-col min-h-screen">
                 <div className="flex-1 flex items-center justify-center p-4 text-center">
@@ -68,7 +58,7 @@ export default function PortfolioShell({ children }) {
     }
 
     return (
-        <PortfolioProvider portfolio={portfolio} slug={slug}>
+        <PortfolioProvider portfolio={portfolio} slug={slug} isLoading={loading}>
             <SEOManager />
             <div className="flex flex-col min-h-screen">
                 <Navbar />

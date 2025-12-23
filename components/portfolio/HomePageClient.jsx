@@ -16,8 +16,10 @@ import Link from 'next/link';
 import { ArrowRight, MessageCircle, Phone } from 'lucide-react';
 import { StickyCTA } from '@/components/shared/sticky-cta';
 
+import { HeroSkeleton, SectionSkeleton } from '@/components/shared/skeleton-loaders';
+
 export default function HomePageClient() {
-    const { portfolio, slug } = usePortfolioContext();
+    const { portfolio, slug, isLoading } = usePortfolioContext();
     const { updatePortfolioTheme, portfolioTheme } = useTheme();
 
     useEffect(() => {
@@ -25,6 +27,19 @@ export default function HomePageClient() {
             updatePortfolioTheme(portfolio);
         }
     }, [portfolio, updatePortfolioTheme]);
+
+    if (isLoading && !portfolio) {
+        return (
+            <div className="min-h-screen">
+                <HeroSkeleton />
+                <SectionContainer variant="default">
+                    <LayoutContainer>
+                        <SectionSkeleton />
+                    </LayoutContainer>
+                </SectionContainer>
+            </div>
+        );
+    }
 
     if (!portfolio) {
         return (
