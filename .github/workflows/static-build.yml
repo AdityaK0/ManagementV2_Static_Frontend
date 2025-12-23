@@ -19,15 +19,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build static site
+      - name: Build static site (GLOBAL)
         env:
-          NEXT_PUBLIC_VENDOR_SLUG: aadhya-shopping
           NEXT_PUBLIC_API_URL_FASTAPI: https://v2-api.fordgeindia.online/api
         run: npm run build
 
-      - name: Deploy to S3
+      - name: Deploy to S3 (ROOT)
         run: |
-          aws s3 sync out/ s3://${{ secrets.S3_BUCKET }}/aadhya-shopping/ --delete
+          aws s3 sync out/ s3://${{ secrets.S3_BUCKET }}/ --delete
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
