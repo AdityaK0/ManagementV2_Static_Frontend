@@ -34,8 +34,8 @@ export function ProductCard({ product, showStockStatus = true }) {
     // Store product in memory
     setProductCache(product.id, product);
 
-    // Navigate using path parameters
-    router.push(`/products/${product.id}`);
+    // Navigate using query parameters
+    router.push(`/product?id=${product.id}`);
   };
 
   return (
@@ -167,7 +167,7 @@ export function CollectionCard({ collection }) {
 
   return (
     <motion.div
-      onClick={() => router.push(`/collections/${collection.id}`)}
+      onClick={() => router.push(`/collection?id=${collection.id}`)}
       className="cursor-pointer"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}

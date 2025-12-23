@@ -1,5 +1,5 @@
 'use client';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { usePortfolioContext } from '@/context/portfolioContext';
 import { useProduct } from '@/hooks/api-hooks';
@@ -10,7 +10,8 @@ import { ProductDetailSkeleton } from '@/components/shared/skeleton-loaders';
 
 export default function ProductPageClient({ initialProduct }) {
   const params = useParams();
-  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id') || (Array.isArray(params?.id) ? params.id[0] : params?.id);
   const { slug, portfolio } = usePortfolioContext();
 
 

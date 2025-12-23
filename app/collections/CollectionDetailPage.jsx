@@ -2,17 +2,19 @@
 
 import Image from 'next/image';
 import { EmptyState, LoadingSpinner } from '@/components/shared/loading-states';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { usePortfolioContext } from '@/context/portfolioContext';
 import CollectionProductItem from './CollectionProductItem';
 import { useCollectionDetail } from '@/hooks/api-hooks';
 
 export default function CollectionDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const { slug } = usePortfolioContext();
 
-  const idArray = params?.id;
-  const id = Array.isArray(idArray) ? idArray[0] : idArray;
+  const idFromQuery = searchParams.get('id');
+  const idFromArray = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const id = idFromQuery || idFromArray;
 
   // Fetch collection details using the API
   const { data: collection, isLoading, error } = useCollectionDetail(slug, id);
