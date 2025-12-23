@@ -15,15 +15,9 @@ export function Navbar() {
   const { portfolio, slug } = usePortfolioContext();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState(pathname);
   const { isDarkMode, toggleDarkMode, portfolioTheme } = useTheme();
 
   const displayData = portfolio;
-
-  // Sync activeLink with pathname when navigation completes
-  useEffect(() => {
-    setActiveLink(pathname);
-  }, [pathname]);
 
   const links = [
     { href: `/`, label: 'Home' },
@@ -34,16 +28,15 @@ export function Navbar() {
     { href: `/contact`, label: 'Contact' },
   ];
 
-  const handleLinkClick = (href) => {
-    setActiveLink(href);
+  const handleLinkClick = () => {
     setSidebarOpen(false);
   };
 
   const checkActive = (href) => {
     if (href === '/') {
-      return activeLink === '/';
+      return pathname === '/';
     }
-    return activeLink.startsWith(href);
+    return pathname.startsWith(href);
   };
 
   return (
@@ -56,7 +49,7 @@ export function Navbar() {
           <Link 
             href="/" 
             className="flex items-center gap-3" 
-            onClick={() => handleLinkClick('/')}
+            onClick={handleLinkClick}
             prefetch={true}
           >
             {displayData?.logo && (
@@ -84,7 +77,7 @@ export function Navbar() {
                 <Link
                   key={l.href}
                   href={l.href}
-                  onClick={() => handleLinkClick(l.href)}
+                  onClick={handleLinkClick}
                   prefetch={true}
                   className={`text-sm font-medium transition-colors relative group py-2
                     ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-primary'}
@@ -155,7 +148,7 @@ export function Navbar() {
                 className={`block px-4 py-3 rounded-lg text-base transition duration-200
                   ${isActive ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-accent text-muted-foreground'}
                 `}
-                onClick={() => handleLinkClick(l.href)}
+                onClick={handleLinkClick}
               >
                 {l.label}
               </Link>
