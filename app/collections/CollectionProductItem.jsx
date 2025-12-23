@@ -2,6 +2,7 @@
 
 import { ProductCard } from '@/components/shared/cards';
 import { ProductCardSkeleton } from '@/components/shared/skeleton-loaders';
+import { LoadingSpinner, EmptyState } from '@/components/shared/loading-states';
 import { useProduct } from '@/hooks/api-hooks';
 
 function CollectionProductItem({ productId, slug }) {
@@ -21,10 +22,14 @@ function CollectionProductItem({ productId, slug }) {
   );
 
   if (isLoading) return <ProductCardSkeleton />;
-  if (isError || !product) return <EmptyState
-    title="Product Not Found"
-    description={error?.message || "The requested product does not exist or could not be loaded."}
-  />;
+  if (isError || !product) {
+    return (
+      <EmptyState
+        title="Product Not Found"
+        description={error?.message || "The requested product does not exist or could not be loaded."}
+      />
+    );
+  }
 
   return <ProductCard product={product} />;
 }

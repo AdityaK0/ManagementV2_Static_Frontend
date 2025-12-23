@@ -9,13 +9,16 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 
-export function Navbar({ vendor, slug, portfolio }) {
+import { usePortfolioContext } from '@/context/portfolioContext';
+
+export function Navbar() {
+  const { portfolio, slug } = usePortfolioContext();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeLink, setActiveLink] = useState(pathname);
   const { isDarkMode, toggleDarkMode, portfolioTheme } = useTheme();
 
-  const displayData = portfolio || vendor;
+  const displayData = portfolio;
 
   // Sync activeLink with pathname when navigation completes
   useEffect(() => {
@@ -38,9 +41,9 @@ export function Navbar({ vendor, slug, portfolio }) {
 
   const checkActive = (href) => {
     if (href === '/') {
-      return activeLink === '/' || activeLink === `/${slug}` || activeLink === `/${slug}/`;
+      return activeLink === '/';
     }
-    return activeLink.startsWith(href) || (slug && activeLink.startsWith(`/${slug}${href}`));
+    return activeLink.startsWith(href);
   };
 
   return (

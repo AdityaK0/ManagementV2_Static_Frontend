@@ -20,7 +20,7 @@ export const useProducts = (
   return useQuery({
     queryKey: ['products', slug, page, search, min_price, max_price, category],
     queryFn: () =>
-      api_v1.get(`/portfolio/public/${slug}/products/`, {  // ✅ Regular template literal
+      api_v1.get(`/portfolio/public/${slug}/products`, {  // ✅ Regular template literal
         params: {
           page,
           page_size: 10,

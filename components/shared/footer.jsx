@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { usePortfolioContext } from '@/context/portfolioContext';
 
-export function Footer({ vendor, slug, portfolio }) {
+export function Footer() {
+  const { portfolio } = usePortfolioContext();
   const currentYear = new Date().getFullYear();
-  
-  // Use portfolio data if available, fallback to vendor
-  const displayData = portfolio || vendor;
-  
+
+  // Use portfolio data if available
+  const displayData = portfolio;
+
   const socialLinks = [
     { icon: Facebook, href: displayData?.social_links?.facebook },
     { icon: Twitter, href: displayData?.social_links?.twitter },
@@ -34,49 +36,28 @@ export function Footer({ vendor, slug, portfolio }) {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Quick Links</h3>
 
-              <div className="grid grid-cols-2 gap-2">
-                <Link href={`/`} className="text-sm hover:text-primary transition-colors">
-                  Home
-                </Link>
-                <Link href={`/products`} className="text-sm hover:text-primary transition-colors">
-                  Products
-                </Link>
-                <Link href={`/collections`} className="text-sm hover:text-primary transition-colors">
-                  Collections
-                </Link>
-                <Link href={`/about`} className="text-sm hover:text-primary transition-colors">
-                  About
-                </Link>
-                {/* <Link href={`/testimonials`} className="text-sm hover:text-primary transition-colors">
-                  Testimonials
-                </Link> */}
-                <Link href={`/contact`} className="text-sm hover:text-primary transition-colors">
-                  Contact
-                </Link>
-              </div>
-
-
-            {/*  SLUG HAS NOW BECAME THE PART OF THE SUBDOMAIN SO NO NEED TO DEPEND ON THE SLUG AFTER DOMAIN NAME */}
-            {/* <div className="grid grid-cols-2 gap-2">
-              <Link href={`/${slug}`} className="text-sm hover:text-primary transition-colors">
+            <div className="grid grid-cols-2 gap-2">
+              <Link href={`/`} className="text-sm hover:text-primary transition-colors">
                 Home
               </Link>
-              <Link href={`/${slug}/products`} className="text-sm hover:text-primary transition-colors">
+              <Link href={`/products`} className="text-sm hover:text-primary transition-colors">
                 Products
               </Link>
-              <Link href={`/${slug}/collections`} className="text-sm hover:text-primary transition-colors">
+              <Link href={`/collections`} className="text-sm hover:text-primary transition-colors">
                 Collections
               </Link>
-              <Link href={`/${slug}/about`} className="text-sm hover:text-primary transition-colors">
+              <Link href={`/about`} className="text-sm hover:text-primary transition-colors">
                 About
               </Link>
-              <Link href={`/${slug}/testimonials`} className="text-sm hover:text-primary transition-colors">
-                Testimonials
-              </Link>
-              <Link href={`/${slug}/contact`} className="text-sm hover:text-primary transition-colors">
+              {/* <Link href={`/testimonials`} className="text-sm hover:text-primary transition-colors">
+                  Testimonials
+                </Link> */}
+              <Link href={`/contact`} className="text-sm hover:text-primary transition-colors">
                 Contact
               </Link>
-            </div> */}
+            </div>
+
+
           </div>
 
           {/* Contact & Social */}

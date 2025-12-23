@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export function ProductCard({ product, slug, showStockStatus = true }) {
+export function ProductCard({ product, showStockStatus = true }) {
   const {
     name,
     images = [],
@@ -34,7 +34,7 @@ export function ProductCard({ product, slug, showStockStatus = true }) {
     // Store product in memory
     setProductCache(product.id, product);
 
-    // Navigate without encoding data
+    // Navigate using path parameters
     router.push(`/products/${product.id}`);
   };
 
@@ -163,9 +163,12 @@ export function ProductCard({ product, slug, showStockStatus = true }) {
 
 export function CollectionCard({ collection }) {
   const { name, cover_image, product_ids } = collection;
+  const router = useRouter();
 
-  return (  
+  return (
     <motion.div
+      onClick={() => router.push(`/collections/${collection.id}`)}
+      className="cursor-pointer"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.02 }}

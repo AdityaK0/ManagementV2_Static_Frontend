@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 
-export default function ProductsPage() {
+export default function ProductListingPage() {
   const { slug, portfolio } = usePortfolioContext();
   const topRef = useRef(null);
   
@@ -42,7 +42,7 @@ export default function ProductsPage() {
   } = useInfiniteQuery({
     queryKey: ['products', slug, appliedFilters],
     queryFn: async ({ pageParam = 1 }) => {
-      const res = await api_v1.get(`/portfolio/public/${slug}/products/`, {
+      const res = await api_v1.get(`/portfolio/public/${slug}/products`, {
         params: {
           page: pageParam,
           page_size: 10,

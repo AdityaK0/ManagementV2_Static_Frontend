@@ -1,13 +1,11 @@
 import { generateContactMetadata } from '@/lib/seo';
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata() {
   try {
-    const resolvedParams = await params;
-    const slug = resolvedParams.slug;
+    const slug = process.env.NEXT_PUBLIC_VENDOR_SLUG;
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL_FASTAPI}/portfolio/public/${slug}/`,
-      { cache: "no-store" }
+      `${process.env.NEXT_PUBLIC_API_URL_FASTAPI}/portfolio/public/${slug}/`
     );
     const portfolio = await response.json();
 

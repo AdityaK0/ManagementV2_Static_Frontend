@@ -5,12 +5,12 @@ import { EmptyState } from '@/components/shared/loading-states';
 import { SectionSkeleton } from '@/components/shared/skeleton-loaders';
 import { CollectionCard } from '@/components/shared/cards';
 import Link from 'next/link';
-import { use } from 'react';
+import { usePortfolioContext } from '@/context/portfolioContext';
 
-export default function CollectionsPage({ params }) {
-  const { slug } = use(params);
+export default function CollectionListingPage() {
+  const { slug } = usePortfolioContext();
   const { data: collections, isLoading } = useCollections(slug);
-  console.log("Collections data in CollectionsPage:", collections);
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">

@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   reactCompiler: true,
 
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         // protocol: 'https',
@@ -20,15 +22,6 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
-  },
-
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:8001/api/:path*',
-      },
-    ];
   },
 };
 
