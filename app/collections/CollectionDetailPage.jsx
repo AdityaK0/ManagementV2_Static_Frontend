@@ -1,34 +1,64 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { EmptyState, LoadingSpinner } from '@/components/shared/loading-states';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { usePortfolioContext } from '@/context/portfolioContext';
 import CollectionProductItem from './CollectionProductItem';
-import { useCollectionDetail } from '@/hooks/api-hooks';
 
 export default function CollectionDetailPage() {
-  const params = useParams();
   const searchParams = useSearchParams();
+  const id = searchParams.get('id');
   const { slug } = usePortfolioContext();
 
-  const idFromQuery = searchParams.get('id');
-  const idFromArray = Array.isArray(params?.id) ? params.id[0] : params?.id;
-  const id = idFromQuery || idFromArray;
+  const [collection, setCollection] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch collection details using the API
-  const { data: collection, isLoading, error } = useCollectionDetail(slug, id);
+  useEffect(() => {
+    if (!slug || !id) return;
 
-  if (isLoading) {
-    return <LoadingSpinner />;
+    const fetchCollection = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL_FASTAPI || 'https://v2-api.fordgeindia.online/api';
+        const response = await fetch(`${baseUrl}/portfolio/public/${slug}/collections/${id}/`);
+
+        if (!response.ok) {
+          throw new Error('Collection not found');
+        }
+
+        const data = await response.json();
+        setCollection(data);
+      } catch (err) {
+        console.error('Error fetching collection details:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCollection();
+  }, [slug, id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (error || !collection) {
     return (
-      <EmptyState
-        title="Collection Not Found"
-        description="The requested collection does not exist."
-      />
+      <div className="min-h-screen flex items-center justify-center">
+        <EmptyState
+          title="Collection Not Found"
+          description={error || "The requested collection does not exist."}
+        />
+      </div>
     );
   }
 

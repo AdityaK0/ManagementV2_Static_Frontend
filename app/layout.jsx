@@ -11,8 +11,8 @@ import PortfolioShell from "@/components/PortfolioShell";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Vendor Portfolio",
-  description: "Discover amazing products from our vendors.",
+  title: "Product Portfolio",
+  description: "Browse products and services.",
 };
 
 export default function RootLayout({ children }) {

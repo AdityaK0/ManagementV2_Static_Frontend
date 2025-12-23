@@ -1,51 +1,51 @@
 'use client';
-import { useParams, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { usePortfolioContext } from '@/context/portfolioContext';
-import { useProduct } from '@/hooks/api-hooks';
 import ProductDetailView from '@/components/shared/ProductDetailView';
 import { setProductCache } from '@/lib/productCache';
 import { EmptyState } from '@/components/shared/loading-states';
 import { ProductDetailSkeleton } from '@/components/shared/skeleton-loaders';
 
-export default function ProductPageClient({ initialProduct }) {
-  const params = useParams();
+export default function ProductDetailPage() {
   const searchParams = useSearchParams();
-  const id = searchParams.get('id') || (Array.isArray(params?.id) ? params.id[0] : params?.id);
-  const { slug, portfolio } = usePortfolioContext();
+  const id = searchParams.get('id');
+  const { slug } = usePortfolioContext();
 
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const effectiveSlug = slug;
-
-  // Validate that we have both slug and id before making the query
-  const isValid = effectiveSlug && id;
-
-  // Use React Query for proper data fetching with caching and refetching
-  // This will always fetch fresh data from backend, even on refresh
-  const { data: product, isLoading, isError, error, isFetching } = useProduct(
-    effectiveSlug,
-    id,
-    {
-      enabled: !!isValid,
-      refetchOnMount: true,
-      // Refetch when window regains focus
-      refetchOnWindowFocus: true,
-      // Don't use stale data - always check with backend
-      staleTime: 0,
-      // Use server data initially if available
-      initialData: initialProduct,
-    }
-  );
-
-  // Cache the product when it's fetched (for quick navigation)
   useEffect(() => {
-    if (product && id) {
-      setProductCache(id, product);
-    }
-  }, [product, id]);
+    if (!slug || !id) return;
 
-  // Show loading state (including when fetching or slug/id not ready)
-  if (!isValid || (!product && isLoading)) {
+    const fetchProduct = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL_FASTAPI || 'https://v2-api.fordgeindia.online/api';
+        const response = await fetch(`${baseUrl}/portfolio/public/${slug}/products/${id}/`);
+
+        if (!response.ok) {
+          throw new Error('Product not found');
+        }
+
+        const data = await response.json();
+        setProduct(data);
+        setProductCache(id, data);
+      } catch (err) {
+        console.error('Error fetching product details:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [slug, id]);
+
+  if (loading) {
     return (
       <div className="min-h-screen pt-20">
         <ProductDetailSkeleton />
@@ -53,13 +53,12 @@ export default function ProductPageClient({ initialProduct }) {
     );
   }
 
-  // Show error state
-  if (isError || !product) {
+  if (error || !product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <EmptyState
           title="Product Not Found"
-          description={error?.message || "The requested product does not exist or could not be loaded."}
+          description={error || "The requested product does not exist or could not be loaded."}
         />
       </div>
     );
@@ -67,4 +66,3 @@ export default function ProductPageClient({ initialProduct }) {
 
   return <ProductDetailView product={product} />;
 }
-
