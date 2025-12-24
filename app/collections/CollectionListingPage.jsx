@@ -36,7 +36,7 @@ export default function CollectionListingPage() {
         {collections.map((collection) => (
           <Link
             key={collection.id}
-            href={`/collection?id=${collection.id}`}
+            href={`/collections?id=${collection.id}`}
           >
             <CollectionCard collection={collection} />
           </Link>
