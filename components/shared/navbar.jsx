@@ -28,15 +28,37 @@ export function Navbar() {
     { href: `/contact`, label: 'Contact' },
   ];
 
+  // Close sidebar when pathname changes (only if sidebar is open)
+  // This handles mobile navigation timing issues where active state gets stuck
+  useEffect(() => {
+    if (sidebarOpen) {
+      setSidebarOpen(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
   const handleLinkClick = () => {
-    setSidebarOpen(false);
+    // Use requestAnimationFrame to ensure navigation starts before closing sidebar
+    // This prevents race conditions on mobile
+    requestAnimationFrame(() => {
+      setSidebarOpen(false);
+    });
   };
 
   const checkActive = (href) => {
-    if (href === '/') {
-      return pathname === '/';
+    // Normalize pathname and href for comparison (handle trailing slashes)
+    const normalizedPathname = pathname.endsWith('/') ? pathname.slice(0, -1) || '/' : pathname;
+    const normalizedHref = href === '/' ? '/' : (href.endsWith('/') ? href.slice(0, -1) : href);
+    
+    if (normalizedHref === '/') {
+      return normalizedPathname === '/';
     }
-    return pathname.startsWith(href);
+    
+    // More precise matching: must match exactly or be a subpath with a slash
+    // e.g., '/products' matches '/products' or '/products/' or '/products/123'
+    // but not '/product' or '/product-something'
+    return normalizedPathname === normalizedHref || 
+           normalizedPathname.startsWith(normalizedHref + '/');
   };
 
   return (
