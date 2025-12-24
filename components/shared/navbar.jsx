@@ -21,32 +21,22 @@ export function Navbar() {
 
   const links = [
     { href: `/`, label: 'Home' },
-    { href: `/products`, label: 'Products' },
-    { href: `/collections`, label: 'Collections' },
-    { href: `/about`, label: 'About' },
-    // { href: `/testimonials`, label: 'Testimonials' },
-    { href: `/contact`, label: 'Contact' },
+    { href: `/products/`, label: 'Products' },
+    { href: `/collections/`, label: 'Collections' },
+    { href: `/about/`, label: 'About' },
+    // { href: `/testimonials/`, label: 'Testimonials' },
+    { href: `/contact/`, label: 'Contact' },
   ];
 
-  // Close sidebar when pathname changes (only if sidebar is open)
-  // This handles mobile navigation timing issues where active state gets stuck
+  // Close sidebar when pathname changes (closes synchronously after navigation completes)
+  // No stale closure issues since we always set to false, not depending on previous state
   useEffect(() => {
-    if (sidebarOpen) {
-      setSidebarOpen(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setSidebarOpen(false);
   }, [pathname]);
-
-  const handleLinkClick = () => {
-    // Use requestAnimationFrame to ensure navigation starts before closing sidebar
-    // This prevents race conditions on mobile
-    requestAnimationFrame(() => {
-      setSidebarOpen(false);
-    });
-  };
 
   const checkActive = (href) => {
     // Normalize pathname and href for comparison (handle trailing slashes)
+    // Since we're using trailingSlash: true, all hrefs end with / except home
     const normalizedPathname = pathname.endsWith('/') ? pathname.slice(0, -1) || '/' : pathname;
     const normalizedHref = href === '/' ? '/' : (href.endsWith('/') ? href.slice(0, -1) : href);
     
@@ -71,8 +61,7 @@ export function Navbar() {
           <Link 
             href="/" 
             className="flex items-center gap-3" 
-            onClick={handleLinkClick}
-            prefetch={true}
+            prefetch={false}
           >
             {displayData?.logo && (
               <Image
@@ -99,8 +88,7 @@ export function Navbar() {
                 <Link
                   key={l.href}
                   href={l.href}
-                  onClick={handleLinkClick}
-                  prefetch={true}
+                  prefetch={false}
                   className={`text-sm font-medium transition-colors relative group py-2
                     ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-primary'}
                   `}
@@ -142,6 +130,7 @@ export function Navbar() {
         }`}
         onClick={() => setSidebarOpen(false)}
         aria-hidden={!sidebarOpen}
+        style={{ pointerEvents: sidebarOpen ? 'auto' : 'none' }}
       />
 
       {/* Sliding Sidebar */}
@@ -166,11 +155,10 @@ export function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                prefetch={true}
+                prefetch={false}
                 className={`block px-4 py-3 rounded-lg text-base transition duration-200
                   ${isActive ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-accent text-muted-foreground'}
                 `}
-                onClick={handleLinkClick}
               >
                 {l.label}
               </Link>
